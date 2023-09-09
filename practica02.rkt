@@ -13,7 +13,7 @@
 (define (punto-medio p q)
   (if (and (Punto? p) (Punto? q))
       [punto  (/ (+ (punto-x p)(punto-x q)) 2)  (/ (+ (punto-y p)(punto-y q)) 2)]
-      (error 'punto-medio "Sin implementar")))
+      "No se puede realizar la operacion, al menos uno no es punto"))
 
 ;Ejercicio 1.b
 ;Función que recibe dos puntos y devuelve la distancia entre ellos.
