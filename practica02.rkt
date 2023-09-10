@@ -8,6 +8,7 @@
   )
 
 ;; Ejercicio 1.a)
+;punto-medio :: Punto Punto -> Punto
 ;Funcion que recibe dos puntos y regresa el punto medio
 ;entre ellos
 (define (punto-medio p q)
@@ -67,10 +68,35 @@ si dicho elemento se encuentra en la lista y #f en cualquier otro caso|#
          (der ArbolBinarioDeBusqueda?)])
 
 ;; Ejercicio 3.a)
+;elimina :: ArbolBinarioDeBusqueda number -> ArbolBinarioDeBusqueda
 ;Funcion que toma un árbol binario de búsqueda y un elemento, elimina este último
 ;del árbol y regresa el árbol resultante de dicha operación.
-(define (elimina e a)
-  (error 'elimina "Sin implementar"))
+(define (elimina arbol e)
+  (type-case ArbolBinarioDeBusqueda arbol
+    [ArbolVacio () (ArbolVacio)]
+    [ABB (el izq der)
+         (cond
+           [(= e el)
+            (cond
+              [(ArbolVacio? izq) der]
+              [(ArbolVacio? der) izq]
+              [else
+               (ABB (raizNueva izq)(elimina izq (raizNueva izq)) der)])]
+           [(> e el) (ABB el (elimina izq e) der) ]
+           [(< e el) (ABB el izq(elimina der e))])]))
+
+;Funcion Auxiliar
+;raizNueva :: ArbolBinarioDeBusqueda -> number
+;Funcion que calcula la nueva raiz de un arbol binario
+(define (raizNueva arbol)
+  (type-case ArbolBinarioDeBusqueda arbol
+    [ArbolVacio () (ArbolVacio)]
+    [ABB (elemento izq der)
+         (if (ArbolVacio? der)
+             elemento
+             (raizNueva der))]))
+
+
 
 ;; Ejercicio 3.b)
 #|Recibe un árbol binario de búsqueda y una función, aplica esta
