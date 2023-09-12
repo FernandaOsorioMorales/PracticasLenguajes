@@ -54,11 +54,19 @@ si dicho elemento se encuentra en la lista y #f en cualquier otro caso|#
 
 ;; Ejercicio 2.c)
 (define (intercala ls ks)
-  (error 'intercala "Sin implementar"))
+  (cond
+    [(empty? ls) ks]
+    [(empty? ks) ls]
+    [else (cons (car ls) (cons (car ks) (intercala (cdr ls) (cdr ks))))]
+  ))
 
 ;; Ejercicio 2.d)
-(define (aplana ls)
-  (error 'aplana "Sin implementar"))
+(define (aplana ls) 
+  (cond 
+    [(empty? ls) ls]
+    [(pair? ls) (append (aplana (car ls)) (aplana (cdr ls)))]
+    [else (list ls)]))
+
 
 ;;Definición de un Árbol Binario de Búsqueda
 (define-type ArbolBinarioDeBusqueda
