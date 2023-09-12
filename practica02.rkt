@@ -17,8 +17,8 @@
       "No se puede realizar la operacion, al menos uno no es punto"))
 
 ;Ejercicio 1.b
-;Función que recibe dos puntos y devuelve la distancia entre ellos.
 ;distancia ::Punto Punto -> Number
+;Función que recibe dos puntos y devuelve la distancia entre ellos.
 
 (define (distancia p q)
     (if(and(Punto? p)(Punto? q))
@@ -27,6 +27,7 @@
       "No se puede porque al menos uno no es un punto")
  )
 
+;; Definición de lista
 (define-type Lista
     [Vacia]
     [Cons (cabeza any?) (resto Lista?)])
@@ -53,6 +54,8 @@ si dicho elemento se encuentra en la lista y #f en cualquier otro caso|#
   )
 
 ;; Ejercicio 2.c)
+;; intercala :: Lista Lista ->Lista
+; Función que recibe dos listas e intercala los elementos de la segunda con los de la primera.
 (define (intercala ls ks)
   (cond
     [(empty? ls) ks]
@@ -61,6 +64,9 @@ si dicho elemento se encuentra en la lista y #f en cualquier otro caso|#
   ))
 
 ;; Ejercicio 2.d)
+;; aplana :: Lista ->Lista
+;; Función que recibe una lista cuyos elementos pueden ser otras listas y devuelve una lista que contenga
+;; todos los elementos de la lista, así como de las sublistas.
 (define (aplana ls) 
   (cond 
     [(empty? ls) ls]
@@ -107,6 +113,7 @@ si dicho elemento se encuentra en la lista y #f en cualquier otro caso|#
 
 
 ;; Ejercicio 3.b)
+; mapea-arbol :: ArbolBinarioBusqueda Función -> ArbolBinarioBusqueda
 #|Recibe un árbol binario de búsqueda y una función, aplica esta
 última a cada elemento del árbol y devuelve el árbol resultado de esto.|#
 (define (mapea-arbol ab f)
@@ -118,6 +125,9 @@ si dicho elemento se encuentra en la lista y #f en cualquier otro caso|#
 
 
 ;; Ejercicio 3.c)
+;; hojas :: ArbolBinarioDeBusqueda ->(listof any)
+;; Función que recibe un árbol binario de búsqueda y regresa una lista con los valores de
+; cada una de sus hojas. 
 (define (hojas ar)
   (type-case ArbolBinarioDeBusqueda ar
     [ArbolVacio () '()]
