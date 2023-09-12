@@ -119,7 +119,12 @@ si dicho elemento se encuentra en la lista y #f en cualquier otro caso|#
 
 ;; Ejercicio 3.c)
 (define (hojas ar)
-  (error 'hojas "Sin implementar"))
+  (type-case ArbolBinarioDeBusqueda ar
+    [ArbolVacio () '()]
+    [ABB (elemento izq der)
+         (if (and (ArbolVacio? izq) (ArbolVacio? der))
+             (list elemento)
+             (append (hojas izq) (hojas der)))]))
 
 ;; Punto Extra
 (define (mas-repetido ls)
