@@ -6,15 +6,13 @@
   (cond
     [(number? s-exp) (num s-exp)]
     [(symbol? s-exp) (id s-exp)]
-    [(boolean? s-exp) (bool a-exp)]
+    [(boolean? s-exp) (bool s-exp)]
     [(list? s-exp) (let ([head (car s-exp)])
                      (case head
-                       [(+) (add (parse (second s-exp))
-                                 (parse (third s-exp)))]
-                       [(-) (sub (parse (second s-exp))
-                                 (parse (third s-exp)))]
+                       [(+) (op + (map parse (cdr s-exp)))]
+                       [(-) (op - (map parse (second s-exp)))]
                        ;[(and) (op and (map parser (cdr s-exp)))]
                        [(with) (let ([assign (second s-exp)])
                                  (with (first assign)
-                                       (parser (second assign))
-                                       (parser (third s-exp))))]))]))
+                                       (parse (second assign))
+                                       (parse (third s-exp))))]))]))
