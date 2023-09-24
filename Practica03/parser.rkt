@@ -10,8 +10,8 @@
     [(list? s-exp) (let ([head (car s-exp)])
                      (case head
                        [(+) (op + (map parse (cdr s-exp)))]
-                       [(-) (op - (map parse (second s-exp)))]
-                       ;[(and) (op and (map parser (cdr s-exp)))]
+                       [(-) (op - (map parse (cdr s-exp)))]
+                       [(anD) (op anD (map parse (cdr s-exp)))]
                        [(with) (let ([assign (second s-exp)])
                                  (with (first assign)
                                        (parse (second assign))
