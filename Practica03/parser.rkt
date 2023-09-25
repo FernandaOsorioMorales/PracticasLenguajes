@@ -1,6 +1,8 @@
 #lang plai
 
 (require "grammars.rkt")
+(define (list-to-binding ls)
+  (binding (car ls) (parse (cdr ls)) ))
 
 (define (parse s-exp)
   (cond
@@ -12,7 +14,9 @@
                        [(+) (op + (map parse (cdr s-exp)))]
                        [(-) (op - (map parse (cdr s-exp)))]
                        [(anD) (op anD (map parse (cdr s-exp)))]
-                       [(with) (let ([assign (second s-exp)])
-                                 (with (first assign)
-                                       (parse (second assign))
-                                       (parse (third s-exp))))]))]))
+                       [(with*) (let* ([vars (second s-exp)]
+                                  [bindings (map list-to-binding
+                                                 vars)])
+                                (with* bindings
+                                       parse (third s-exp)))]))]))
+

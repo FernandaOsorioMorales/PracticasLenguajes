@@ -10,7 +10,7 @@
   [bool (b boolean?)]
   [strinG (s string?)]
   [num (n number?)]
-  [op (o procedure?) (args (listof WAE?))]
+  [op (f procedure?) (args (listof WAE?))]
   [with (assigns (listof Binding?)) (body WAE?)]
   [with* (assigns (listof Binding?)) (body WAE?)])
 
