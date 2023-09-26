@@ -1,5 +1,4 @@
 #lang plai
-
 (require "grammars.rkt")
 (define (list-to-binding ls)
   (binding (car ls) (parse (cdr ls)) ))
@@ -9,35 +8,33 @@
     [(number? s-exp) (num s-exp)]
     [(symbol? s-exp) (id s-exp)]
     [(boolean? s-exp) (bool s-exp)]
-    [(list? s-exp) (let ([head (car s-exp)])
-                     (case head
-                       [(+) (op + (map parse (cdr s-exp)))]
-                       [(-) (op - (map parse (cdr s-exp)))]
-                       [(*) (op * (map parse (cdr s-exp)))]
-                       [(/) (op / (map parse (cdr s-exp)))]
-                       [(mod) (op modulo (map parse (cdr s-exp)))]
-                       [(min) (op min (map parse (cdr s-exp)))]
-                       [(max) (op max (map parse (cdr s-exp)))]
-                       [(expt) (op expt (map parse (cdr s-exp)))]
-                       [(sqrt) (op sqrt (map parse (cdr s-exp)))]
-                       [(Sub1) (if (= (length(cdr s-exp))1) (op sub1 (map parse (cdr s-exp))) (error 'Sub1 "Número de argumentos incorrecto"))]
-                       [(Add1) (if (= (length(cdr s-exp))1) (op add1 (map parse (cdr s-exp))) (error 'Sub1 "Número de argumentos incorrecto"))]
-                      [(<) (op < (map parse (cdr s-exp)))]
-                      [(>) (op > (map parse (cdr s-exp)))]
-                      [(<=) (op <= (map parse (cdr s-exp)))]
-                      [(>=) (op >= (map parse (cdr s-exp)))]
-                      [(=) (op = (map parse (cdr s-exp)))]
-                      [(not) (op not(map parse (cdr s-exp)))]
-                      [(anD) (op anD (map parse (cdr s-exp)))]
-                      [(oR) (op oR (map parse (cdr s-exp)))]
-                      [(Zero?) (op zero? (map parse (cdr s-exp)))]
-                      [(Num?) (op num? (map parse (cdr s-exp)))]
-                      [(Str?) (op string? (map parse (cdr s-exp)))]
-                      [(Bool?) (op boolean? (map parse (cdr s-exp)))]
-                      [(str-length) (op string-length (map parse (cdr s-exp)))]
-                       [(with*) (let* ([vars (second s-exp)]
+    [(list? s-exp)
+     (let ([head (car s-exp)])
+       (case (first s-exp)
+         ;De aridad 1
+         [(sub1 add1 not zero? num? str? bool? str-length )
+          (if(=(length (cdr s-exp))1)
+             (op (eval head (make-base-namespace))( map parse (cdr s-exp)))
+             (error 'argumentos-incorrectos
+                    (format "Se espera ~a argumento, y se han recibido ~a" 1 (length (cdr s-exp)))))]
+         ;De aridad 2
+         [(expt mod )
+          (if(=(length (cdr s-exp))2)
+             (op (eval head (make-base-namespace))( map parse (cdr s-exp)))
+             (error 'argumentos-incorrectos
+                    (format "Se esperan ~a argumentos, y se han recibido ~a" 2 (length (cdr s-exp)))))]
+         ;Se espera que sean mas de 0 argumentos
+         [(+ - * / min max sqrt < > <= >= = anD oR)
+          (if(>(length (cdr s-exp))0)
+             (op (eval head (make-base-namespace))( map parse (cdr s-exp)))
+             (error 'argumentos-incorrectos
+                    (format "Se esperan ~a argumentos, y se han recibido ~a" 2 (length (cdr s-exp)))))]
+         ;[(with)]
+
+                     
+         [(with*) (let* ([vars (second s-exp)]
                                   [bindings (map list-to-binding
                                                  vars)])
-                                (with* bindings
-                                       parse (third s-exp)))]))]))
+                  (with* bindings
+                         parse (third s-exp)))]))]))
 

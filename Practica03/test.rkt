@@ -2,33 +2,46 @@
 (require "grammars.rkt")
 (require "parser.rkt")
 
-;Prueba para parse de más de 2
-;(parse '{+ 1 2 3 4})
-;(parse '{- 1 2 3 4})
-;(parse '{* 1 2 3 4})
-;(parse '{min 1 2 3 4})
-;(parse '{max 1 2 3 4})
-
-
+;Pruebas que funcionan
+;Parse
 ;Aridad de 1
-;(parse '{Sub1 3})
-;(parse '{Sub1 1 2})
-;(parse '{Add1 3})
-;(parse '{Add1 1 2})
-;(parse '{not 1 2})
-
-
+;(parse '{sub1 3})
+(parse '{sub1 2})
+;(parse '{add1 3})
+(parse '{add1 1 })
 
 ;Aridad de 2
+(parse '{expt 1 2 })
+
+;Prueba para argumentos con numero mayor a 0
+(parse '{+ 1 2})
+;(parse '{- 1 2 3 4})
+;(parse '{* 1 2 3 4})
 ;(parse '{/ 1 2 3 4})
-;(parse '{mod 1 2 3 4})
-;(parse '{anD 1 2 3 4})
-;(parse '{expt 1 2 3 4})
+(parse '{min 1 2 3 4})
+;(parse '{max 1 2 3 4})
 ;(parse '{sqrt 1 2 3 4)
 ;(parse '{> 1 2})
 ;(parse '{< 1 2})
 
 ;(parse '{<= 1 2})
 ;(parse '{>= 1 2})
-;(parse '{= 1 2})
-;(parse '{oR 1 2})
+(parse '{= 1 2})
+;(parse '{oR #t #f})
+;(parse '{anD 12 3})
+
+;Subst
+
+;Interp
+
+
+;Pruebas que arrojan un error
+;;Parse
+;Aridad 1
+;(parse '{not 1 2})
+
+;(parse '{mod 1 2 3 4})
+
+;Subst
+
+;Interp
