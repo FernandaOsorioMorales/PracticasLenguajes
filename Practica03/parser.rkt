@@ -1,7 +1,11 @@
 #lang plai
 (require "grammars.rkt")
 (define (list-to-binding ls)
-  (binding (car ls) (parse (cdr ls)) ))
+  (cond
+    [(empty? ls) (error 'list-to-binding "La lista ingresada es vacía")]
+    [(not(=(length ls)2)) (error 'list-to-binding "No se puede hacer binding por cantidad de
+elementos distinta a 2")]
+    [else (binding (car ls)(parse (second ls)))]))
 
 (define (parse s-exp)
   (cond
