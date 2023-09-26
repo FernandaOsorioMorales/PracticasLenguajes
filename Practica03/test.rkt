@@ -30,6 +30,9 @@
 ;(parse '{oR #t #f})
 ;(parse '{anD 12 3})
 
+(parse '{with {{hi "Hello"}} {str-length hi}})
+
+
 ;Subst
 
 ;Interp

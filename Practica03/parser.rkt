@@ -29,12 +29,29 @@
              (op (eval head (make-base-namespace))( map parse (cdr s-exp)))
              (error 'argumentos-incorrectos
                     (format "Se esperan ~a argumentos, y se han recibido ~a" 2 (length (cdr s-exp)))))]
-         ;[(with)]
-
-                     
+         ;Los casos del with
+         [(with)  (let* ([vars (second s-exp)] [bindings (map list-to-binding vars)]
+                   [comparador (lambda (x y)(symbol=? (first x) (first y)))])
+             (if (boolean? (hayDuplicados? bindings comparador))
+                 (with bindings (parse (third s-exp)))
+                 (error 'parse "se ha declarado un mismo identificador más de una vez"))
+                    )];fin del caso del with
          [(with*) (let* ([vars (second s-exp)]
                                   [bindings (map list-to-binding
                                                  vars)])
                   (with* bindings
-                         parse (third s-exp)))]))]))
+                         (parse (third s-exp))))]))]))
 
+       (define (hayDuplicados? lst comparador) 
+         (cond
+           [(empty? lst) #f]
+           [(estaVariable? (first lst) (cdr lst) comparador) (first lst)]
+           [else (hayDuplicados? (cdr lst) comparador)]))
+
+      (define (estaVariable? e lst comparador)
+        (cond
+          [(empty? lst) #f]
+          [(comparador (first lst) e) #t]
+          [else (estaVariable? e (cdr lst) comparador)]))
+
+      
