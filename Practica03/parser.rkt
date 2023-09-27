@@ -20,19 +20,30 @@ elementos distinta a 2")]
           (if(=(length (cdr s-exp))1)
              (op (eval head (make-base-namespace))( map parse (cdr s-exp)))
              (error 'argumentos-incorrectos
-                    (format "Se espera ~a argumento, y se han recibido ~a" 1 (length (cdr s-exp)))))]
+                    (format "Se espera 1 argumento, y se han recibido ~a"  (length (cdr s-exp)))))]
          ;De aridad 2
          [(expt mod )
           (if(=(length (cdr s-exp))2)
              (op (eval head (make-base-namespace))( map parse (cdr s-exp)))
              (error 'argumentos-incorrectos
-                    (format "Se esperan ~a argumentos, y se han recibido ~a" 2 (length (cdr s-exp)))))]
+                    (format "Se esperan 2 argumentos, y se han recibido ~a"  (length (cdr s-exp)))))]
          ;Se espera que sean mas de 0 argumentos
-         [(+ - * / min max sqrt < > <= >= = anD oR)
+         [(+ - * / min max sqrt < > <= >= = )
           (if(>(length (cdr s-exp))0)
              (op (eval head (make-base-namespace))( map parse (cdr s-exp)))
              (error 'argumentos-incorrectos
-                    (format "Se esperan ~a argumentos, y se han recibido ~a" 2 (length (cdr s-exp)))))]
+                    (format "Se esperan 2 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
+         ;Caso de and
+         [(and) (if (> (length (cdr s-exp)) 0)
+           (op anD (map parse (cdr s-exp)))
+           (error 'argumentos-incorrectos
+                  (format "Se esperan al menos 2 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
+         ;Caso de or
+         [(or) (if (> (length (cdr s-exp)) 0)
+           (op oR (map parse (cdr s-exp)))
+           (error 'argumentos-incorrectos
+                  (format "Se esperan al menos 2 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
+
          ;Los casos del with
          [(with)  (let* ([vars (second s-exp)] [bindings (map list-to-binding vars)]
                    [comparador (lambda (x y)(symbol=? (first x) (first y)))])
@@ -58,4 +69,5 @@ elementos distinta a 2")]
           [(comparador (first lst) e) #t]
           [else (estaVariable? e (cdr lst) comparador)]))
 
-      
+
+

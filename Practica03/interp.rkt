@@ -1,4 +1,4 @@
-#lang plai
+   #lang plai
 
 (require "grammars.rkt")
 (require "parser.rkt")
