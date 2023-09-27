@@ -7,7 +7,7 @@
 ;Extender la definicion de la gramatica del lenguaje WAE
 (define-type WAE
   [id (i symbol?)]
-  [bool (b bool?)]
+  [bool (b boolean?)]
   [strinG (s string?)]
   [num (n number?)]
   [op (f procedure?) (args (listof WAE?))]
