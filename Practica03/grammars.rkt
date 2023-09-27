@@ -4,10 +4,10 @@
   [binding (id symbol?) (value WAE?)])
 
 ;Ejercicio 1)
-;Extender la definicion de la gramatica del lengueje WAE
+;Extender la definicion de la gramatica del lenguaje WAE
 (define-type WAE
   [id (i symbol?)]
-  [bool (b boolean?)]
+  [bool (b bool?)]
   [strinG (s string?)]
   [num (n number?)]
   [op (f procedure?) (args (listof WAE?))]
