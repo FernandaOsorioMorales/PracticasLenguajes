@@ -27,10 +27,11 @@
 ;(parse '{<= 1 2})
 ;(parse '{>= 1 2})
 (parse '{= 1 2})
-(parse '{or #t #f})
+(parse '{or 2 5})
 (parse '{and 4 3})
 (parse '{with {{x 5}} {+ 3 8}})
-;(parse '{with ({x "Hello"}) {str-length x}})
+(parse '{with {{hi "Hello"}} {str-length hi}})
+
 
 
 

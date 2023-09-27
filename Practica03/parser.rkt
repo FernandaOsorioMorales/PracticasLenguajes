@@ -17,11 +17,17 @@ elementos distinta a 2")]
      (let ([head (car s-exp)])
        (case (first s-exp)
          ;De aridad 1
-         [(sub1 add1 not zero? num? str? bool? str-length )
+         [(sub1 add1 not zero? num? str? bool? )
           (if(=(length (cdr s-exp))1)
              (op (eval head (make-base-namespace))( map parse (cdr s-exp)))
              (error 'argumentos-incorrectos
                     (format "Se espera 1 argumento, y se han recibido ~a"  (length (cdr s-exp)))))]
+         ;Caso str-length
+         [(str-length) (if (= (length (cdr s-exp)) 1)
+           (op string-length (map parse (cdr s-exp)))
+           (error 'argumentos-incorrectos
+                  (format "Se espera 1 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
+         
          ;De aridad 2
          [(expt mod )
           (if(=(length (cdr s-exp))2)
