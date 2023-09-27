@@ -17,7 +17,8 @@
     [num (n) expr]
     [bool (b) (bool b)]
     [op (f args) (op f (map (lambda (x) (subst sub-id val x)) args))]
-    [with (asings body) (subst-with2 asings body sub-id val)]
+    [with (asings body) (subst-with asings body sub-id val)]
+    [with* (asings body) (subst-with2 asings body sub-id val)]
     [else (error 'i "")]))
 
 
@@ -28,10 +29,16 @@
   
 
 
-(define (subst-with2 assings body sub-id val)
+(define (subst-with assings body sub-id val)
   (if (empty? (filter (lambda (x) (type-case Binding assings [binding (i valor) (symbol=? i sub-id)])) assings))
       (with (map (lambda (x) (type-case Binding assings [binding (i valor) (binding i (subst valor sub-id val))])) assings) (subst body sub-id val))
       (with (map (lambda (x) (type-case Binding assings [binding (i valor) (binding i (subst valor sub-id val))])) assings) body)))
+
+
+(define (subst-with2 assings body sub-id val)
+  (if (empty? (filter (lambda (x) (type-case Binding assings [binding (i valor) (symbol=? i sub-id)])) assings))
+      (with* (map (lambda (x) (type-case Binding assings [binding (i valor) (binding i (subst valor sub-id val))])) assings) (subst body sub-id val))
+      (with* (map (lambda (x) (type-case Binding assings [binding (i valor) (binding i (subst valor sub-id val))])) assings) body)))
   
 
   
