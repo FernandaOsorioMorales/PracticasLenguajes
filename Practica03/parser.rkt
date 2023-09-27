@@ -9,8 +9,8 @@ elementos distinta a 2")]
 
 (define (parse s-exp)
   (cond
-    [(number? s-exp) (num s-exp)]
-    [(symbol? s-exp) (id s-exp)]
+    [(number? s-exp) (num s-exp)] ; Subst
+    [(symbol? s-exp) (id s-exp)] ;
     [(boolean? s-exp) (bool s-exp)]
     [(list? s-exp)
      (let ([head (car s-exp)])
@@ -46,16 +46,16 @@ elementos distinta a 2")]
                   (with* bindings
                          (parse (third s-exp))))]))]))
 
-       (define (hayDuplicados? lst comparador) 
-         (cond
-           [(empty? lst) #f]
-           [(estaVariable? (first lst) (cdr lst) comparador) (first lst)]
-           [else (hayDuplicados? (cdr lst) comparador)]))
+(define (hayDuplicados? lst comparador)
+  (cond
+    [(empty? lst) #f]
+    [(estaVariable? (first lst) (cdr lst) comparador) (first lst)]
+    [else (hayDuplicados? (cdr lst) comparador)]))
 
-      (define (estaVariable? e lst comparador)
-        (cond
-          [(empty? lst) #f]
-          [(comparador (first lst) e) #t]
-          [else (estaVariable? e (cdr lst) comparador)]))
+(define (estaVariable? e lst comparador)
+  (cond
+    [(empty? lst) #f]
+    [(comparador (first lst) e) #t]
+    [else (estaVariable? e (cdr lst) comparador)]))
 
       
