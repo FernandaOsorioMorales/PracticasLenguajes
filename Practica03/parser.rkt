@@ -17,11 +17,31 @@ elementos distinta a 2")]
      (let ([head (car s-exp)])
        (case (first s-exp)
          ;De aridad 1
-         [(sub1 add1 not zero? num? str? bool? )
+         [(sub1 add1 not )
           (if(=(length (cdr s-exp))1)
              (op (eval head (make-base-namespace))( map parse (cdr s-exp)))
              (error 'argumentos-incorrectos
                     (format "Se espera 1 argumento, y se han recibido ~a"  (length (cdr s-exp)))))]
+         ;Caso zero?
+         [(zero?) (if (= (length (cdr s-exp)) 1)
+           (op zero? (map parse (cdr s-exp)))
+           (error 'argumentos-incorrectos
+                  (format "Se espera 1 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
+         ;Caso num?
+         [(num?) (if (= (length (cdr s-exp)) 1)
+           (op number? (map parse (cdr s-exp)))
+           (error 'argumentos-incorrectos
+                  (format "Se espera 1 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
+         ;Caso str?
+         [(str?) (if (= (length (cdr s-exp)) 1)
+           (op string? (map parse (cdr s-exp)))
+           (error 'argumentos-incorrectos
+                  (format "Se espera 1 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
+         ;Caso bool?
+         [(bool?) (if (= (length (cdr s-exp)) 1)
+           (op boolean? (map parse (cdr s-exp)))
+           (error 'argumentos-incorrectos
+                  (format "Se espera 1 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
          ;Caso str-length
          [(str-length) (if (= (length (cdr s-exp)) 1)
            (op string-length (map parse (cdr s-exp)))
@@ -29,7 +49,7 @@ elementos distinta a 2")]
                   (format "Se espera 1 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
          
          ;De aridad 2
-         [(expt mod )
+         [(expt modulo )
           (if(=(length (cdr s-exp))2)
              (op (eval head (make-base-namespace))( map parse (cdr s-exp)))
              (error 'argumentos-incorrectos

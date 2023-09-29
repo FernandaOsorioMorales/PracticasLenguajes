@@ -8,21 +8,20 @@
     [id (i) (error 'interp "Variable libre.")]
     [num (n) n]
     [bool (b) b]
-    ;[strinG (s) s]
+    [strinG (s) s]
     [op(f args) (apply f (map (lambda (x) (interp x)) args))]
     [with (bs bo) (interp (subst-list-bindings bs bo))]
-    [with* (bs bo) (interp (toWith (with* bs bo)))]
-    [else (error 'interp"")]))
+    [with* (bs bo) (interp (toWith (with* bs bo)))]))
 
-(define (subst expr sub-id val)
+(define (subst  sub-id val expr)
   (type-case WAE expr
     [id (i) (if (symbol=? i sub-id id) val expr)]
     [num (n) expr]
     [bool (b) (bool b)]
+    [strinG (s) expr]
     [op (f args) (op f (map (lambda (x) (subst x sub-id val)) args))]
     [with (asings body) (subst-withAlt asings body sub-id val)]
-    [with* (asings body) (subst (toWith expr) sub-id val)]
-    [else (error 'i "")]))
+    [with* (asings body) (subst (toWith expr) sub-id val)]))
 
 (define (subst-withAlt ass body sub-id val)
   (if (empty? (filter (lambda (x) (type-case Binding ass [binding (i valor) (symbol=? i sub-id)])) ass))
