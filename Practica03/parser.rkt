@@ -72,17 +72,23 @@ elementos distinta a 2")]
                   (format "Se esperan al menos 2 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
 
          ;Los casos del with
-         [(with)  (let* ([vars (second s-exp)] [bindings (map list-to-binding vars)]
-                   [comparador (lambda (x y)(symbol=? (first x) (first y)))])
-             (if (boolean? (hayDuplicados? bindings comparador))
-                 (with bindings (parse (third s-exp)))
-                 (error 'parse "se ha declarado un mismo identificador más de una vez"))
-                    )];fin del caso del with
-         [(with*) (let* ([vars (second s-exp)]
-                                  [bindings (map list-to-binding
-                                                 vars)])
-                  (with* bindings
-                         (parse (third s-exp))))]))]))
+         [(with)  (with (parseo-bindings-normal (second s-exp)) (parse (third s-exp)))];fin del caso del with
+         [(with*) (with (parseo-bindings-estrellita (second s-exp)) (parse (third s-exp)))]; fin del caso with*
+         ))]
+    ))
+
+       (define (parseo-bindings-normal ls-bindings)
+         (let ([comparador (lambda (x y) (symbol=? (first x) (first y)))])
+    (if (boolean? (hayDuplicados? ls-bindings comparador))
+        (map (lambda (parseoVar) (binding (first parseoVar) (parse (cadr parseoVar))))
+             ls-bindings)
+          (error 'parseo-bindings-normal "Hay un identificador duplicado"))) 
+         )
+
+       (define (parseo-bindings-estrellita ls-bindings)
+         (map (lambda (parseoVar) (binding (first parseoVar) (parse (cadr parseoVar))))
+           ls-bindings)
+         )
 
        (define (hayDuplicados? lst comparador) 
          (cond

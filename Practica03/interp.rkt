@@ -5,13 +5,14 @@
 
 (define (interp expr)
   (type-case WAE expr
-    [id (i) (error 'interp "Variable libre.")]
+    [id (i) (error 'interp (format "Variable libre: ~a" (id-i expr)))]
     [num (n) n]
     [bool (b) b]
     [strinG (s) s]
     [op(f args) (apply f (map (lambda (x) (interp x)) args))]
-    [with (bs bo) (interp (subst-list-bindings bs bo))]
-    [with* (bs bo) (interp (toWith (with* bs bo)))]))
+    [with (assings body)
+                   (interp (subst-lista-bindings (interpABindings assings) body))]
+    [with* (assigns body) (interp (toWith assigns body))]))
 
 (define (subst  sub-id val expr)
   (type-case WAE expr
@@ -20,29 +21,47 @@
     [bool (b) (bool b)]
     [strinG (s) expr]
     [op (f args) (op f (map (lambda (x) (subst x sub-id val)) args))]
-    [with (asings body) (subst-withAlt asings body sub-id val)]
-    [with* (asings body) (subst (toWith expr) sub-id val)]))
+    [with (bindings body)
+          (let ([variables (map binding-id bindings)])
+                     (let ([comparador (lambda (x y) (symbol=? x y))])
+                       (cond
+                         [(estaVariable? sub-id variables comparador)
+                          (with
+                           (map (lambda (cadaPar)
+                                  (binding (binding-id cadaPar) (subst sub-id val (binding-value cadaPar)))) bindings) body)]
+                         [else
+                          (with
+                          (map (lambda (cadaPar)
+                                  (binding (binding-id cadaPar) (subst sub-id val (binding-value cadaPar)))) bindings)
+                          (subst sub-id val body))])))]
+    
+    [with* (bindings body)
+           (subst sub-id val (toWith bindings body))]))
 
-(define (subst-withAlt ass body sub-id val)
-  (if (empty? (filter (lambda (x) (type-case Binding ass [binding (i valor) (symbol=? i sub-id)])) ass))
-      (with  (substBindings sub-id val ass) (subst body sub-id val))
-      (with (substBindings sub-id val ass) body)))
- 
-(define (substBindings sub-id val bs)
-  (match  bs
-    ['() empty]
-    [(cons x xs) (cons (binding (binding-id x) (subst (binding-value x) sub-id val)) (substBindings sub-id val xs))]))
-
-(define (subst-list-bindings bs bo)
-  (if (empty? bs) bo
-      [let ([head (car bs)])
-        (subst-list-bindings (cdr bs) (subst bo (binding-id head) (binding-value head)))]))
 
 
-(define (toWith w)
-  (type-case WAE with*
-     [with* (ass body)
-            (cond
-              [(empty? ass) body]
-              [else (with (list (car ass) (toWith (with* (cdr ass) body))))])]
-     [else (error "No es with*")]))
+; Función para pasar de un with* a un with normal
+(define (toWith bindings body)
+ (cond
+    [(empty? bindings) body]
+    [else (with (list (car bindings)) (toWith (cdr bindings) body))]))
+
+; Subst a la lista de bindings
+(define (subst-lista-bindings bindings body)
+  (cond
+    [(empty? bindings) body]
+    [else
+     (subst
+      (binding-id (car bindings))
+      (binding-value (car bindings))
+      (subst-lista-bindings (cdr bindings) body))]))
+
+; Interp a la lista de bindings
+(define (interpABindings bindings)
+  (cond
+    [(empty? bindings) '()]
+    [else
+     (cons
+      (type-case Binding (car bindings)
+        [binding (id value) (binding id (parse (interp value)))])
+      (interpABindings (cdr bindings)))]))
