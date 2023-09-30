@@ -82,7 +82,7 @@ elementos distinta a 2")]
     (if (boolean? (hayDuplicados? ls-bindings comparador))
         (map (lambda (parseoVar) (binding (first parseoVar) (parse (cadr parseoVar))))
              ls-bindings)
-          (error 'parseo-bindings-normal "Hay un identificador duplicado"))) 
+          (error 'parseo-bindings-normal "parse: El identificador x está declarado más de una vez"))) 
          )
 
        (define (parseo-bindings-estrellita ls-bindings)

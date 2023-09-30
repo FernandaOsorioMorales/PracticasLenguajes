@@ -5,7 +5,7 @@
 
 (define (interp expr)
   (type-case WAE expr
-    [id (i) (error 'interp (format "Variable libre: ~a" (id-i expr)))]
+    [id (i) (error 'interp (format "Variable libre: '~a" (id-i expr)))]
     [num (n) n]
     [bool (b) b]
     [strinG (s) s]
@@ -16,28 +16,47 @@
 
 (define (subst  sub-id val expr)
   (type-case WAE expr
-    [id (i) (if (symbol=? i sub-id id) val expr)]
+    [id (i) (if (symbol=? i sub-id) val expr)]
     [num (n) expr]
     [bool (b) (bool b)]
     [strinG (s) expr]
-    [op (f args) (op f (map (lambda (x) (subst x sub-id val)) args))]
-    [with (bindings body)
-          (let ([variables (map binding-id bindings)])
-                     (let ([comparador (lambda (x y) (symbol=? x y))])
-                       (cond
-                         [(estaVariable? sub-id variables comparador)
-                          (with
-                           (map (lambda (cadaPar)
-                                  (binding (binding-id cadaPar) (subst sub-id val (binding-value cadaPar)))) bindings) body)]
-                         [else
-                          (with
-                          (map (lambda (cadaPar)
-                                  (binding (binding-id cadaPar) (subst sub-id val (binding-value cadaPar)))) bindings)
-                          (subst sub-id val body))])))]
-    
-    [with* (bindings body)
-           (subst sub-id val (toWith bindings body))]))
+    [op (f args) (op f (map (lambda (x) (subst sub-id val x)) args))]
+    [with (bindings body) (subst-with (with bindings body) sub-id val)]
+    [with* (bindings body) (subst sub-id val (toWith bindings body))]))
 
+
+
+(define (subst-with elwith sub-id val)
+  (if (isBindingIn? sub-id (with-ass elwith))
+      (with (substBindings sub-id val (with-ass elwith)) (get-with-body elwith))
+      (with (substBindings sub-id val (with-ass elwith)) (subst sub-id val (get-with-body elwith)))))
+
+
+(define (isBindingIn? id a)
+  (match a ['() #f]
+    [(cons x xs) (if (symbol=? (binding-id x) id) #t (isBindingIn? id xs))]))
+
+(define (with-ass w)
+  (match w
+    [(with ws wb) ws]
+    [(with* ws wb) ws]))
+
+(define (get-with-body w)
+  (match w
+    [(with ws wb) wb]
+    [(with* ws wb) wb]))
+
+(define (substBindings sub-id val bs)
+  (match bs
+    ['() empty]
+    [(cons x xs) (cons (binding (get-binding-id x) (subst sub-id val (get-bindning-value x))) (substBindings sub-id val xs))]))
+
+
+(define (get-bindning-value x)
+  (match x
+    [(binding id val) val]))
+
+(define (get-binding-id x) (match x [(binding id val) id]))
 
 
 ; Función para pasar de un with* a un with normal
@@ -55,6 +74,7 @@
       (binding-id (car bindings))
       (binding-value (car bindings))
       (subst-lista-bindings (cdr bindings) body))]))
+; 
 
 ; Interp a la lista de bindings
 (define (interpABindings bindings)
