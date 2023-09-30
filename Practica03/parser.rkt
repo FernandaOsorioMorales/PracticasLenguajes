@@ -59,17 +59,17 @@ elementos distinta a 2")]
           (if(>(length (cdr s-exp))0)
              (op (eval head (make-base-namespace))( map parse (cdr s-exp)))
              (error 'argumentos-incorrectos
-                    (format "Se esperan 2 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
+                    (format "Se esperan mas de 0 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
          ;Caso de and
          [(and) (if (> (length (cdr s-exp)) 0)
            (op anD (map parse (cdr s-exp)))
            (error 'argumentos-incorrectos
-                  (format "Se esperan al menos 2 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
+                  (format "Se esperan mas de 0 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
          ;Caso de or
          [(or) (if (> (length (cdr s-exp)) 0)
            (op oR (map parse (cdr s-exp)))
            (error 'argumentos-incorrectos
-                  (format "Se esperan al menos 2 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
+                  (format "Se esperan mas de 0 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
 
          ;Los casos del with
          [(with)  (with (parseo-bindings-normal (second s-exp)) (parse (third s-exp)))];fin del caso del with
