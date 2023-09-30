@@ -20,8 +20,8 @@ elementos distinta a 2")]
          [(sub1 add1 not )
           (if(=(length (cdr s-exp))1)
              (op (eval head (make-base-namespace))( map parse (cdr s-exp)))
-             (error 'argumentos-incorrectos
-                    (format "Se espera 1 argumento, y se han recibido ~a"  (length (cdr s-exp)))))]
+             (error 'parse
+                    (format "La operación sub1 debe ser ejecutada con 1 argumentos.")))]
          ;Caso zero?
          [(zero?) (if (= (length (cdr s-exp)) 1)
            (op zero? (map parse (cdr s-exp)))
@@ -58,8 +58,8 @@ elementos distinta a 2")]
          [(+ - * / min max sqrt < > <= >= = )
           (if(>(length (cdr s-exp))0)
              (op (eval head (make-base-namespace))( map parse (cdr s-exp)))
-             (error 'argumentos-incorrectos
-                    (format "Se esperan mas de 0 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
+             (error 'parse
+                    (format "La operación min debe ser ejecutada con mas de 0 argumentos." )))]
          ;Caso de and
          [(and) (if (> (length (cdr s-exp)) 0)
            (op anD (map parse (cdr s-exp)))
