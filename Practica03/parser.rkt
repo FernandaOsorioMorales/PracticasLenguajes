@@ -73,7 +73,7 @@ elementos distinta a 2")]
 
          ;Los casos del with
          [(with)  (with (parseo-bindings-normal (second s-exp)) (parse (third s-exp)))];fin del caso del with
-         [(with*) (with (parseo-bindings-estrellita (second s-exp)) (parse (third s-exp)))]; fin del caso with*
+         [(with*) (with* (parseo-bindings-estrellita (second s-exp)) (parse (third s-exp)))]; fin del caso with*
          ))]
     ))
 
