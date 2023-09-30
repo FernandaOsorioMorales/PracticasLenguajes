@@ -1,5 +1,7 @@
 #lang plai
 (require "grammars.rkt")
+;Función list-to-binding que convierte una lista en bindings (pares de variables con sus
+;respectivos valores)
 (define (list-to-binding ls)
   (cond
     [(empty? ls) (error 'list-to-binding "La lista ingresada es vacía")]
@@ -7,6 +9,7 @@
 elementos distinta a 2")]
     [else (binding (car ls)(parse (second ls)))]))
 
+; Función parse que analiza sintácticamente que las expresiones estén escritas de forma correcta
 (define (parse s-exp)
   (cond
     [(number? s-exp) (num s-exp)]
@@ -77,6 +80,7 @@ elementos distinta a 2")]
          ))]
     ))
 
+    ;Función que parsea bindings cuando se encuentran en un with convencional
        (define (parseo-bindings-normal ls-bindings)
          (let ([comparador (lambda (x y) (symbol=? (first x) (first y)))])
     (if (boolean? (hayDuplicados? ls-bindings comparador))
@@ -84,18 +88,19 @@ elementos distinta a 2")]
              ls-bindings)
           (error 'parseo-bindings-normal "parse: El identificador x está declarado más de una vez"))) 
          )
-
+     ; Función que parsea bindings cuando se encuentran en un with estrellita
        (define (parseo-bindings-estrellita ls-bindings)
          (map (lambda (parseoVar) (binding (first parseoVar) (parse (cadr parseoVar))))
            ls-bindings)
          )
-
+       ; Función auxiliar que se encarga de ver si hay variables duplicadas en una lista
        (define (hayDuplicados? lst comparador) 
          (cond
            [(empty? lst) #f]
            [(estaVariable? (first lst) (cdr lst) comparador) (first lst)]
            [else (hayDuplicados? (cdr lst) comparador)]))
 
+      ; Función que nos ayuda a verficar si una variable se encuentra en una lista 
       (define (estaVariable? e lst comparador)
         (cond
           [(empty? lst) #f]

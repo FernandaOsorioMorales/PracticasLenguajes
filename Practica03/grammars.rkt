@@ -1,5 +1,8 @@
 #lang plai
 
+;Archivo Grammar que funciona como base de todo nuestro chiqui-lenguaje
+
+;Definición del tipo binding que corresponderá a una lista de id y valor. 
 (define-type Binding
   [binding (id symbol?) (value WAE?)])
 

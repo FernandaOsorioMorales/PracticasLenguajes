@@ -3,6 +3,7 @@
 (require "grammars.rkt")
 (require "parser.rkt")
 
+; Función interp que recibe la expresión del parse y se encarga de evaluarla.
 (define (interp expr)
   (type-case WAE expr
     [id (i) (error 'interp (format "Variable libre: '~a" (id-i expr)))]
@@ -14,6 +15,8 @@
                    (interp (subst-lista-bindings (interpABindings assings) body))]
     [with* (assigns body) (interp (toWith assigns body))]))
 
+; Función subst que recibe un id, un valor y una expresión y se encarga de sustiuir la variable con el valor en la
+; expresión 
 (define (subst  sub-id val expr)
   (type-case WAE expr
     [id (i) (if (symbol=? i sub-id) val expr)]
@@ -25,27 +28,30 @@
     [with* (bindings body) (subst sub-id val (toWith bindings body))]))
 
 
-
+; Función  auxiliar que nos ayuda a hacer subst con el with 
 (define (subst-with elwith sub-id val)
   (if (isBindingIn? sub-id (with-ass elwith))
       (with (substBindings sub-id val (with-ass elwith)) (get-with-body elwith))
       (with (substBindings sub-id val (with-ass elwith)) (subst sub-id val (get-with-body elwith)))))
 
-
+; Función auxilizar que revisa si un binding se encuentra en una expresión.
 (define (isBindingIn? id a)
   (match a ['() #f]
     [(cons x xs) (if (symbol=? (binding-id x) id) #t (isBindingIn? id xs))]))
+
 
 (define (with-ass w)
   (match w
     [(with ws wb) ws]
     [(with* ws wb) ws]))
 
+;Función auxiliar que obtiene el cuerpo del with
 (define (get-with-body w)
   (match w
     [(with ws wb) wb]
     [(with* ws wb) wb]))
 
+; Función auxiliar que sustituye en una lista de bindings. 
 (define (substBindings sub-id val bs)
   (match bs
     ['() empty]
