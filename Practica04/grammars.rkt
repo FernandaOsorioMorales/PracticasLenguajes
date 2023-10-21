@@ -8,17 +8,17 @@
 
 ;; Lenguaje con azucar sintactica
 (define-type CFWSBAE
-  [numS (n number?)]
-  [idS (i symbol?)]
-  [boolS (b boolean?)]
-  [strinGS (s string?)]
+  [numS (n number?)] ;;
+  [idS (i symbol?)] ;;
+  [boolS (b boolean?)] ;;
+  [strinGS (s string?)] ;;
   [opS (f procedure?) (args (listof CFWSBAE?))]
   [withS (bindings (listof Binding?)) (body CFWSBAE?)]
   [with*S (bindings (listof Binding?)) (body CFWSBAE?)]
   [funS (params (listof symbol?)) (body CFWSBAE?)]
   [appS (f CFWSBAE?) (args (listof CFWSBAE?))]
   [iFS (test-expr CFWSBAE?) (then-expr CFWSBAE?) (else-expr CFWSBAE?)]
-  [conDS (conds (listof Condition?)) (else-expr CFWSBAE?)])
+  [conDS (conds (listof Condition?)) (else-expr CFWSBAE?)]) ;;
 
 (define-type CFSBAE
   [num (n number?)]

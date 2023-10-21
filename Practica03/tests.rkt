@@ -56,7 +56,7 @@
 (test/exn (prueba'{with {{a 2} {b {+ a a}}} b}) "interp: Variable libre: 'a")
 (test (prueba'{with* {{a 2} {b {+ a a}}} b}) 4)
 (test/exn (prueba'{with {{y 1} {x y}} x}) "interp: Variable libre: 'y")
-(test (prueba'{with* {{x y} {y 1}} x}) 1)
+(test (prueba'{with* {{y 1} {x y}} x}) 1)
 (test (prueba '{with {{x 5}}
                      {with {{x 2}}
                            {+ x x}}}) 4)
