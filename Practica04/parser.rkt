@@ -14,11 +14,52 @@
 (define (parse-ls s-exp)
   (let([head (first s-exp)] [rst (rest s-exp)])
     (case head
+      ;Aridad 1
+      [(sub1 add1 not)
+          (if(=(length (cdr s-exp))1)
+             (opS (eval head (make-base-namespace))( map parse (cdr s-exp)))
+             (error 'parse
+                    (format "La operación sub1 debe ser ejecutada con 1 argumentos.")))]
+       ;Caso zero?
+         [(zero?) (if (= (length (cdr s-exp)) 1)
+           (opS zero? (map parse (cdr s-exp)))
+           (error 'argumentos-incorrectos
+                  (format "Se espera 1 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
+         ;Caso num?
+         [(num?) (if (= (length (cdr s-exp)) 1)
+           (opS number? (map parse (cdr s-exp)))
+           (error 'argumentos-incorrectos
+                  (format "Se espera 1 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
+         ;Caso str?
+         [(str?) (if (= (length (cdr s-exp)) 1)
+           (opS string? (map parse (cdr s-exp)))
+           (error 'argumentos-incorrectos
+                  (format "Se espera 1 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
+         ;Caso bool?
+         [(bool?) (if (= (length (cdr s-exp)) 1)
+           (opS boolean? (map parse (cdr s-exp)))
+           (error 'argumentos-incorrectos
+                  (format "Se espera 1 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
+         ;Caso str-length
+         [(str-length) (if (= (length (cdr s-exp)) 1)
+           (opS string-length (map parse (cdr s-exp)))
+           (error 'argumentos-incorrectos
+                  (format "Se espera 1 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
+         ;De aridad 2
+         [(expt modulo )
+          (if(=(length (cdr s-exp)) 2)
+             (opS (eval head (make-base-namespace))( map parse (cdr s-exp)))
+             (error 'argumentos-incorrectos
+                    (format "Se esperan 2 argumentos, y se han recibido ~a"  (length (cdr s-exp)))))]
+         ;Se espera que sean mas de 0 argumentos
+         [(+ - * / min max sqrt < > <= >= = )
+          (if(>(length (cdr s-exp))0)
+             (opS (eval head (make-base-namespace)) (map parse (cdr s-exp)))
+             (error 'parse
+                    (format "La operación min debe ser ejecutada con mas de 0 argumentos." )))]
+      
       [(fun) (funS (first rst) (parse (second rst)))]
-      [(if) (iFS (parse (first rst))
-                 (parse (second rst))
-                 (parse (third rst)))]
-
+      [(if) (parse-if rst)]
       [(cond) (if (<= (length (cdr s-exp)) 1)
                   (error 'parse "parse: La expresión conds debe contar con 1 o mas condiciones y una expresión else.")
                   (let [(other (last s-exp))]
@@ -27,6 +68,16 @@
        [(with)  (withS (parseo-bindings-normal (second s-exp)) (parse (third s-exp)))];fin del caso del with
        [(with*) (with*S (parseo-bindings-estrellita (second s-exp)) (parse (third s-exp)))]; fin del caso with*
          )))
+
+
+;
+(define (parse-if rst)
+  
+  (iFS (parse (first rst))
+                 (parse (second rst))
+                 (parse (third rst))))
+
+
 
 
 ;(parse-condition '{#t 10})
