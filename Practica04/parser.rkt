@@ -19,7 +19,6 @@
                  (parse (second rst))
                  (parse (third rst)))]
 
-      
       [(cond) (if (<= (length (cdr s-exp)) 1)
                   (error 'parse "parse: La expresión conds debe contar con 1 o mas condiciones y una expresión else.")
                   (let [(other (last s-exp))]
@@ -41,7 +40,6 @@
       empty
       (cons (parse-condition (first conds))
             (parse-condition (second conds)))))
-
 
 
 ;Función que parsea bindings cuando se encuentran en un with convencional
