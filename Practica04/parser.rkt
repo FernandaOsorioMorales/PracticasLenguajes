@@ -57,7 +57,6 @@
              (opS (eval head (make-base-namespace)) (map parse (cdr s-exp)))
              (error 'parse
                     (format "La operación min debe ser ejecutada con mas de 0 argumentos." )))]
-      
       [(fun) (funS (first rst) (parse (second rst)))]
       [(if) (parse-if rst)]
       [(cond) (if (<= (length (cdr s-exp)) 1)
@@ -65,19 +64,19 @@
                   (let [(other (last s-exp))]
                      (conDS (map parse-conditions (take (cdr s-exp) (sub1 (length (cdr s-exp)))))
                             (parse (second other)))))]
-       [(with)  (withS (parseo-bindings-normal (second s-exp)) (parse (third s-exp)))];fin del caso del with
-       [(with*) (with*S (parseo-bindings-estrellita (second s-exp)) (parse (third s-exp)))]; fin del caso with*
-         )))
+       [(with)  (withS (parseo-bindings-normal (second s-exp)) (parse (third s-exp)))]
+       [(with*) (with*S (parseo-bindings-estrellita (second s-exp)) (parse (third s-exp)))]
+)))
 
 
-;
+; Parse if
 (define (parse-if rst)
-  
-  (iFS (parse (first rst))
-                 (parse (second rst))
-                 (parse (third rst))))
-
-
+  (match rst
+    [empty (error 'parse "parse: No se provio de cuerpo de if.")]
+    [(list a) (error 'parse "parse: Solo se provio la condicion, no las expresiones del if.")]
+    [(list a b) (error 'parse "parse: Falta la else-expression.")]
+    [(list a b c) (iFS (parse a) (parse b) (parse c))]
+    [else (error 'parse "parse: Expresiones de mas proveidas.")))
 
 
 ;(parse-condition '{#t 10})
