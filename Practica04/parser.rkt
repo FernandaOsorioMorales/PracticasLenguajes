@@ -46,7 +46,7 @@
            (error 'argumentos-incorrectos
                   (format "Se espera 1 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
          ;De aridad 2
-         [(expt modulo )
+         [(expt modulo)
           (if(=(length (cdr s-exp)) 2)
              (opS (eval head (make-base-namespace))( map parse (cdr s-exp)))
              (error 'argumentos-incorrectos
@@ -57,39 +57,41 @@
              (opS (eval head (make-base-namespace)) (map parse (cdr s-exp)))
              (error 'parse
                     (format "La operación min debe ser ejecutada con mas de 0 argumentos." )))]
-      [(fun) (funS (first rst) (parse (second rst)))]
+      [(fun) (parse-fun rst)]
       [(if) (parse-if rst)]
       [(cond) (if (<= (length (cdr s-exp)) 1)
                   (error 'parse "parse: La expresión conds debe contar con 1 o mas condiciones y una expresión else.")
                   (let [(other (last s-exp))]
-                     (conDS (map parse-conditions (take (cdr s-exp) (sub1 (length (cdr s-exp)))))
+                     (conDS (map parse-condition (take (cdr s-exp) (sub1 (length (cdr s-exp)))))
                             (parse (second other)))))]
        [(with)  (withS (parseo-bindings-normal (second s-exp)) (parse (third s-exp)))]
        [(with*) (with*S (parseo-bindings-estrellita (second s-exp)) (parse (third s-exp)))]
+       [else (parse-apps s-exp)]
 )))
 
+
+(define (parse-apps apps)
+  (appS (parse (first apps)) (map parse (cdr apps))))
+
+        
+(define (parse-fun rst)
+  (if (check-duplicates (first rst))
+      (error 'parse (format "Parámetro '~a definido dos veces." (check-duplicates (first rst))))
+      (funS (first rst) (parse (second rst)))))
 
 ; Parse if
 (define (parse-if rst)
   (match rst
-    [empty (error 'parse "parse: No se provio de cuerpo de if.")]
+    ['() (error 'parse "parse: No se provio de cuerpo de if.")]
     [(list a) (error 'parse "parse: Solo se provio la condicion, no las expresiones del if.")]
     [(list a b) (error 'parse "parse: Falta la else-expression.")]
     [(list a b c) (iFS (parse a) (parse b) (parse c))]
-    [else (error 'parse "parse: Expresiones de mas proveidas.")))
+    [else (error 'parse "parse: Expresiones de mas proveidas.")]))
 
 
-;(parse-condition '{#t 10})
 (define (parse-condition cdn)
   (condition (parse (first cdn))
              (parse (second cdn)))) 
-
-
-(define (parse-conditions conds)
-  (if (empty? conds)
-      empty
-      (cons (parse-condition (first conds))
-            (parse-condition (second conds)))))
 
 
 ;Función que parsea bindings cuando se encuentran en un with convencional
