@@ -14,7 +14,7 @@
     [funS (param body) (fun param (desugar body))]
     [with*S (bs bo) (desugar (toWiths bs bo))]
     [withS (bs bo)
-          (let ([pairBS (bs-to-pair bs (cons '() '()))])
+          (let ([pairBS (bsParapar bs (cons '() '()))])
             (app (fun (reverse (car pairBS)) (desugar bo)) (reverse (cdr pairBS))))]
     [appS (f args) (app (desugar f) (map (lambda (a) (desugar a)) args))]
     [iFS (test then else) (iF (desugar test) (desugar then) (desugar else))]
@@ -34,9 +34,10 @@
     ['() bo]
     [(cons x xs) (withS (list x) (toWiths xs bo))]))
             
-(define (bs-to-pair bs acc)
+(define (bsParapar bs acumulador)
   (if (empty? bs)
-      acc
+      acumulador
       (type-case Binding (car bs)
-        [binding (id value) (bs-to-pair (cdr bs) (cons (cons id (car acc))
-                                  (cons (desugar value) (cdr acc))))])))
+        [binding (id value) (bsParapar (cdr bs) (cons (cons id (car acumulador))
+                                  (cons (desugar value) (cdr acumulador
+                                                             ))))])))
