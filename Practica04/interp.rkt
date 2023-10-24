@@ -14,7 +14,6 @@
   [mt-env]
   [cons-env (id symbol?) (value CFSBAE-Val?) (rest-env Env?)])
 
-;; interp :: CFSBAE x Env -> CFSBAE-Val
 (define (interp expr env)
     (match expr
       [(num n) (num-v n)]
@@ -22,48 +21,39 @@
       [(strinG s) (string-v s)]
       [(id x) (lookup x env)]
       [(fun param body) (closure-v param body env)]
-      [(op f args) (apply f (map (lambda (x) (interp x env)) args))]
-      ;;[(app f args) (interp-app f args env)]
-      [(app fun-expr arg)
-       (let ([fun-val (interp fun-expr mt-env)])
-         (interp
-          (closure-v-body fun-val)
-          (cons-env (closure-v-args fun-val) (interp arg) (closure-v-env fun-val))))]
+      [(op f args) (interp (desugar (parse (apply f (value-list (map (lambda (e) (interp e env)) args))))) mt-env)]
+      [(app f args)
+         (let ([fun-val (interp f env)])
+           (interp (closure-v-body fun-val)  (get-env (closure-v-args fun-val) args (closure-v-env fun-val))))]
       [(iF test then other) (interp-if (interp test env) then other env)]
 ))
 
 
-(define (interp-app f args env)
-  (match f [(fun fargs body) (interp-app-aux fargs args body env)]))
-
-
-(define (interp-app-aux fargs args body env)
-  (if (= (length fargs) (length args))
-      (interp body (adds-to-env fargs args env))
+(define (get-env vars args env)
+  (if (= (length vars) (length args))
+      (add-to-env vars args env)
       (error 'interp "Numero de argumentos y parametros distinto")))
 
+(define (add-to-env vars args env)
+  (if (empty? vars)
+     env
+     (cons-env (car vars) (interp (car args) env) (add-to-env (cdr vars) (cdr args) env))))
+
+(define (value-list args)
+  (if (empty? args) empty
+      (type-case CFSBAE-Val (car args)
+        [num-v (n) (cons n (value-list (cdr args)))]
+        [bool-v (b) (cons b (value-list (cdr args)))]
+        [string-v (s) (cons s (value-list (cdr args)))]
+        [else error 'interp "Error al obtener el valor"])))
 
 (define (interp-if test then other env)
-  (match test
-    [(bool-v v) (if v (interp then env) (interp other env))]
+  (type-case CFSBAE-Val test
+    [bool-v (v) (if v (interp then env) (interp other env))]
     [else (error 'interp "interp: La condición de una expresión if debe ser un booleano.")]))
 
-
-;; lookup :: symbol x Env -> CFSBAE-Val
 (define (lookup sub-id env)
-  (match env
-    [mt-env (error 'interp (format "Variable libre ~a" sub-id))] 
-    [(cons-env id val renv) (if (symbol=? id sub-id) val (lookup sub-id renv))]
+  (type-case Env env
+    [mt-env () (error 'interp (format "Variable libre ~a" sub-id))] 
+    [cons-env (id val renv) (if (symbol=? id sub-id) val (lookup sub-id renv))]
   ))
-
-
-(define (adds-to-env fargs args env)
-  (if (= (length fargs) 0)
-      env
-      (adds-to-env (cdr fargs) (cdr args) (add-to-env (first fargs) (first args) env))))
-
-
-(define (add-to-env id val env)
-  (match env
-    [mtv-env (cons-env id val mtv-env)]
-    [(cons-env a b renv) (cons-env a b (add-to-env id val renv))]))
