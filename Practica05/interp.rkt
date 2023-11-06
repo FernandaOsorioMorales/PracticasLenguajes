@@ -18,7 +18,17 @@
   [rec-cons-env (id symbol?) (value boxed-RCFSBAE-Val?) (rest-env Env?)])
 
 ;; RCFSBAE x Env -> RCFSBAE-Val
-(define (interp expr env) (error 'interp "Sin implementar"))
+(define (interp expr env) (error 'interp "sin implementar"))
 
 ;; symbol x Env -> RCFSBAE-Val
-(define (lookup sub-id env) (error 'lookup "Sin implementar"))
+(define (lookup sub-id env)
+  (type-case Env env
+    [mt-env() (error 'lookup "no binding for identifier")]
+    [cons-env (bound-name bound-value rest-env)
+              (if (symbol=? bound-name sub-id)
+                  bound-value
+                  (lookup sub-id rest-env))]
+    [rec-cons-env (bound-name boxed-bound-value rest-env)
+             (if (symbol=? bound-name sub-id)
+                 (unbox boxed-bound-value)
+                 (lookup sub-id rest-env))]))
