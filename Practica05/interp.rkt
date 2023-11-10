@@ -20,6 +20,7 @@
   [rec-cons-env (id symbol?) (value boxed-RCFSBAE-Val?) (rest-env Env?)])
 
 ;; RCFSBAE x Env -> RCFSBAE-Val
+;Función interp
 (define (interp expr env)
    (match expr
       [(num n) (num-v n)]
@@ -30,7 +31,7 @@
       [(op f args) (interp (parse (apply f (value-list (map (lambda (e) (interp e env)) args)))) mt-env)]
       [(app f args)
          (let ([fun-val (interp f env)])
-           (interp (closure-v-body fun-val)  (get-env (closure-v-args fun-val) args (closure-v-env fun-val))))]
+           (interp (closure-v-body fun-val) (get-env (closure-v-args fun-val) args (closure-v-env fun-val)env)))]
       [(iF test then other) (interp-if (interp test env) then other env)]
      [(rec bindings body)
                   (let* ([mt (nuevo-ambienteRec bindings env)]
@@ -59,16 +60,20 @@
       new-env)))
 
 ;Función auxiliar de interp aplicación de función
-(define (get-env vars args env)
+(define (get-env vars args env env2)
   (if (= (length vars) (length args))
-      (add-to-env vars args env)
+     (add-to-env vars args env env2)
       (error 'interp "Numero de argumentos y parametros distinto")))
 
 ;Función auxiliar de get-env
-(define (add-to-env vars args env)
+(define (add-to-env vars args env env2)
   (if (empty? vars)
-     env
-     (cons-env (car vars) (interp (car args) env) (add-to-env (cdr vars) (cdr args) env))))
+          env
+          (add-to-env
+           (cdr vars)
+           (cdr args)
+           (cons-env (car vars) (interp (car args) env2) env) env2))
+ )
 
 ;Función auxiliar de interp con op
 (define (value-list args)
@@ -81,7 +86,7 @@
 
 ;Función auxiliar de interp con if
 (define (interp-if test then other env)
-    (bool-v (test) (if test (interp then env) (interp other env))))
+    (if (bool-v-b test) (interp then env) (interp other env)))
 
 
 ;; symbol x Env -> RCFSBAE-Val
