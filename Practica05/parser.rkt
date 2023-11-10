@@ -4,10 +4,10 @@
 ;; parse :: s-exp -> RCFSBAE
 (define (parse s-exp)
   (cond
-    [(number? s-exp) (numS s-exp)]
-    [(boolean? s-exp) (boolS s-exp)]
-    [(string? s-exp) (strinGS s-exp)]
-    [(symbol? s-exp) (idS s-exp)]
+    [(number? s-exp) (num s-exp)]
+    [(boolean? s-exp) (bool s-exp)]
+    [(string? s-exp) (strinG s-exp)]
+    [(symbol? s-exp) (id s-exp)]
     [(list? s-exp) (parse-ls s-exp)]))
 
 (define (parse-ls s-exp)
@@ -16,55 +16,65 @@
       ;Aridad 1
       [(sub1 add1 not)
           (if(=(length (cdr s-exp))1)
-             (opS (eval head (make-base-namespace))( map parse (cdr s-exp)))
+             (op (eval head (make-base-namespace))( map parse (cdr s-exp)))
              (error 'parse
                     (format "La operación sub1 debe ser ejecutada con 1 argumentos.")))]
        ;Caso zero?
          [(zero?) (if (= (length (cdr s-exp)) 1)
-           (opS zero? (map parse (cdr s-exp)))
+           (op zero? (map parse (cdr s-exp)))
            (error 'argumentos-incorrectos
                   (format "Se espera 1 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
          ;Caso num?
          [(num?) (if (= (length (cdr s-exp)) 1)
-           (opS number? (map parse (cdr s-exp)))
+           (op number? (map parse (cdr s-exp)))
            (error 'argumentos-incorrectos
                   (format "Se espera 1 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
          ;Caso str?
          [(str?) (if (= (length (cdr s-exp)) 1)
-           (opS string? (map parse (cdr s-exp)))
+           (op string? (map parse (cdr s-exp)))
            (error 'argumentos-incorrectos
                   (format "Se espera 1 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
          ;Caso bool?
          [(bool?) (if (= (length (cdr s-exp)) 1)
-           (opS boolean? (map parse (cdr s-exp)))
+           (op boolean? (map parse (cdr s-exp)))
            (error 'argumentos-incorrectos
                   (format "Se espera 1 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
          ;Caso str-length
          [(str-length) (if (= (length (cdr s-exp)) 1)
-           (opS string-length (map parse (cdr s-exp)))
+           (op string-length (map parse (cdr s-exp)))
            (error 'argumentos-incorrectos
                   (format "Se espera 1 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
          ;De aridad 2
          [(expt modulo)
           (if(=(length (cdr s-exp)) 2)
-             (opS (eval head (make-base-namespace))( map parse (cdr s-exp)))
+             (op (eval head (make-base-namespace))( map parse (cdr s-exp)))
              (error 'argumentos-incorrectos
                     (format "Se esperan 2 argumentos, y se han recibido ~a"  (length (cdr s-exp)))))]
          ;Se espera que sean mas de 0 argumentos
          [(+ - * / min max sqrt < > <= >= = )
           (if(>(length (cdr s-exp))0)
-             (opS (eval head (make-base-namespace)) (map parse (cdr s-exp)))
+             (op (eval head (make-base-namespace)) (map parse (cdr s-exp)))
              (error 'parse
                     (format "La operación min debe ser ejecutada con mas de 0 argumentos." )))]
+       ;Caso de and
+         [(and) (if (> (length (cdr s-exp)) 0)
+           (op anD (map parse (cdr s-exp)))
+           (error 'argumentos-incorrectos
+                  (format "Se esperan mas de 0 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
+         ;Caso de or
+         [(or) (if (> (length (cdr s-exp)) 0)
+           (op oR (map parse (cdr s-exp)))
+           (error 'argumentos-incorrectos
+                  (format "Se esperan mas de 0 argumentos, y se han recibido ~a" (length (cdr s-exp)))))]
       [(fun) (parse-fun rst)]
       [(if) (parse-if rst)]
       [(cond) (if (<= (length (cdr s-exp)) 1)
                   (error 'parse "parse: La expresión conds debe contar con 1 o mas condiciones y una expresión else.")
                   (let [(other (last s-exp))]
-                     (conDS (map parse-condition (take (cdr s-exp) (sub1 (length (cdr s-exp)))))
+                     (cond (map parse-condition (take (cdr s-exp) (sub1 (length (cdr s-exp)))))
                             (parse (second other)))))]
-       [(with)  (withS (parseo-bindings-normal (second s-exp)) (parse (third s-exp)))]
-       [(with*) (with*S (parseo-bindings-estrellita (second s-exp)) (parse (third s-exp)))]
+       [(with)  (with (parseo-bindings-normal (second s-exp)) (parse (third s-exp)))]
+       [(with*) (with* (parseo-bindings-estrellita (second s-exp)) (parse (third s-exp)))]
        [(rec) (rec (parseo-bindings-rec (second s-exp)) (parse (third s-exp)))]
        [else (parse-apps s-exp)]
 )))
@@ -75,13 +85,13 @@
            ls-bindings))
 
 (define (parse-apps apps)
-  (appS (parse (first apps)) (map parse (cdr apps))))
+  (app (parse (first apps)) (map parse (cdr apps))))
 
         
 (define (parse-fun rst)
   (if (check-duplicates (first rst))
       (error 'parse (format "Parámetro '~a definido dos veces." (check-duplicates (first rst))))
-      (funS (first rst) (parse (second rst)))))
+      (fun (first rst) (parse (second rst)))))
 
 ; Parse if
 (define (parse-if rst)
@@ -89,7 +99,7 @@
     ['() (error 'parse "parse: No se provio de cuerpo de if.")]
     [(list a) (error 'parse "parse: Solo se provio la condicion, no las expresiones del if.")]
     [(list a b) (error 'parse "parse: Falta la else-expression.")]
-    [(list a b c) (iFS (parse a) (parse b) (parse c))]
+    [(list a b c) (iF (parse a) (parse b) (parse c))]
     [else (error 'parse "parse: Expresiones de mas proveidas.")]))
 
 
