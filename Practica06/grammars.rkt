@@ -19,6 +19,7 @@
 (define-type Condition
   [condition (test-expr TCFWSBAE?) (then-expr TCFWSBAE?)])
 
+  
 (define-type TCFWSBAE
   [id (i symbol?)]
   [num (n number?)]
@@ -32,3 +33,22 @@
   [with (bindings (listof Binding?)) (body TCFWSBAE?)]
   [with* (bindings (listof Binding?)) (body TCFWSBAE?)])
 
+;anD :: n args -> booolean
+;Funcion que recibe n argumentos y devulve el
+;resultado de aplicar and
+(define (anD . args)
+  (if (null? args)
+      #t
+      (if (car args)
+          (apply anD (cdr args))
+          #f)))
+
+;oR :: n args -> boolean
+;Funcion que recibe n argumentos y devulve el
+;resultado de aplicar or
+(define (oR . args)
+  (if (null? args)
+      #f
+      (if (car args)
+          #t
+          (apply oR (cdr args)))))
