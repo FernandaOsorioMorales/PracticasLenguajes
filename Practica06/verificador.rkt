@@ -6,41 +6,47 @@
 ;; TCFWSBAE x TypeContext -> Type
 (define (typeof expr ctx)
   (type-case TCFWSBAE expr
-     [id (i)(lookup i ctx)]
      [num (n) (numberT)]
      [bool (b) (booleanT)]
      [strinG (s) (stringT)]
-     [fun (params return-type body)(funT (list-types params (verify-type body return-type (create-context params ctx))))]
-     [op (f args)
+     [id (i)(lookup i ctx)]
+     [fun (params tipo bo)(funT (list-types params (verify-type bo tipo (create-context params ctx))))]
+     [op    (f args)
         (for ([arg (in-list args)])
-                (verify-type arg (get-type-params f) ctx))
-                 (get-type-returns f)]
+                (verify-type arg (obtener-tipo f) ctx))
+                 (obtener-tipo-r f)]
      [app (fun-expr arguments)
          (let ([fun-type (typeof fun-expr ctx)])
                  (if (verify-args (funT-params fun-type) arguments ctx)
                      (last (funT-params fun-type))
-                        (error 'typeof "Parametros mal")))]
+                        (error 'typeof "Error en los parametros")))]
      [iF (test-expr then-expr else-expr)
            (if (equal? (typeof test-expr ctx) (booleanT))
                (if (equal? (typeof then-expr ctx) (typeof else-expr ctx))
                    (typeof then-expr ctx) (error 'typeof "El tipo de la rama else tiene que ser el mismo que el de las ramas then"))
-                     (error 'typeof (format "El tipo de las condicionales tiene que ser boolean. Tipo dado: ~v" (typeof test-expr ctx))))]
+                     (error 'typeof (format "El tipo de las condicionales tiene que ser boolean. Tipo dado: ~a" (typeof test-expr ctx))))]
      [conD (conditions else-expr)
           (let* ([type (typeof else-expr ctx)]) (check-conditions conditions type ctx))]
      [with  (bs bo) (correct-bs bs ctx) (typeof bo (create-context (bs-to-params bs) ctx))]
-     [with* (bs bo) (typeof (with*-to-with bs bo) ctx)]))
+     [with* (bs bo) (typeof (withEstrella-to-with bs bo) ctx)]))
 
 
 ;; Funciones Op
-(define (get-type-params f)
-  (cond
-    [(oR (equal? f +) (equal? f -) (equal? f *) (equal? f /) (equal? f min) (equal? f max) (equal? f sqrt) (equal? f <) (equal? f >) (equal? f =)
-         (equal? f modulo) (equal? f expt) (equal? f add1) (equal? f sub1)(equal? f number?) (equal? f zero?))(numberT)]
-    [(oR (equal? f not) (equal? f boolean?) (equal? f oR) (equal? f anD)) (booleanT)]
-    [(oR (equal? f 'string?) (equal? f string-length)) (stringT)]
-    [else (error 'typeof "Funcion no soportada")]))
 
-(define (get-type-returns f)
+(define (obtener-tipo f)
+  (cond
+    [(oR (equal? f +) (equal? f -) (equal? f *) (equal? f /) (equal? f min) (equal? f max)
+         (equal? f sqrt) (equal? f <) (equal? f >) (equal? f =) (equal? f modulo) 
+         (equal? f expt) (equal? f add1) (equal? f sub1) (equal? f number?) 
+         (equal? f zero?))(numberT)]
+    [(oR (equal? f not) (equal? f boolean?) (equal? f oR) (equal? f anD))
+     (booleanT)]
+    [(oR (equal? f 'string?) (equal? f string-length))(stringT)]
+    [else (error 'typeof "Funcion no permitida en el lenguaje")]))
+
+
+
+(define (obtener-tipo-r f)
   (cond
     [(oR (equal? f +) (equal? f -) (equal? f *) (equal? f /) (equal? f min)
          (equal? f max) (equal? f sqrt) (equal? f string-length)
@@ -50,7 +56,7 @@
     [(oR (equal? f not) (equal? f boolean?) (equal? f oR) (equal? f anD) (equal? f 'string?)
          (equal? f <) (equal? f >) (equal? f =) (equal? f number?) (equal? f zero?))
      (booleanT)]
-    [else (error 'typeof "Funcion no soportada")]))
+    [else (error 'typeof "Funcion no peritida en el lenguaje")]))
 
 
 ;;Revision Tipos
@@ -92,10 +98,10 @@
       
 ;; with*-to-with :: binding -> WAE -> WAE
 ;; Pasa un with* a with usando sintactic sugar
-(define (with*-to-with bs bo)
+(define (withEstrella-to-with bs bo)
   (cond
     [(empty? bs) bo]
-    [else (with (list (car bs)) (with*-to-with (cdr bs) bo))]))
+    [else (with (list (first bs)) (withEstrella-to-with (rest bs) bo))]))
 
 
 ;; Se crea contexto
@@ -111,11 +117,11 @@
 (define (list-types params return-type)
   (if (empty? params)
       (cons return-type '())
-      (cons (param-type (car params)) (list-types (cdr params) return-type))))
+      (cons (param-type (first params)) (list-types (rest params) return-type))))
 
-(define (lookup sub-id context)
-  (type-case TypeContext context
-             [phi () (error 'typeof "El identificador no se encuentra en el contexto.")]
+(define (lookup sub-id ctx)
+  (type-case TypeContext ctx
+             [phi () (error 'typeof "Variable libre.")]
              [gamma (id type rst)
                     (if (symbol=? id sub-id)
                         type
@@ -123,7 +129,7 @@
 
 (define (tostr-funt params)
   (if (equal? (length params) 1)
-      (format "~v" (car params))
-      (string-append (format "~v " (car params)) (tostr-funt (cdr params)))))
+      (format "~a" (car params))
+      (string-append (format "~a " (car params)) (tostr-funt (cdr params)))))
 
 
